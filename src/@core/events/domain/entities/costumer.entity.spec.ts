@@ -1,7 +1,7 @@
 import {
   Cpf,
   InvalidCpfError,
-} from 'src/@core/common/domain/value-objects/cpf.vo'
+} from '@/@core/common/domain/value-objects/cpf.vo'
 import { CostumerId, Customer } from './customer.entity'
 
 describe('Aggregate: Costumer', () => {

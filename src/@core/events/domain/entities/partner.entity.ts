@@ -1,5 +1,5 @@
-import { AggregateRoot } from 'src/@core/common/domain/aggregate-root'
-import { Uuid } from 'src/@core/common/domain/value-objects/uuid.vo'
+import { AggregateRoot } from '@/@core/common/domain/aggregate-root'
+import { Uuid } from '@/@core/common/domain/value-objects/uuid.vo'
 import { Event } from './event.entity'
 
 export class PartnerId extends Uuid {}
