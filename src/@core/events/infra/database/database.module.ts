@@ -4,6 +4,8 @@ import { PartnerRepository } from '@/@core/events/domain/repositories/partner.re
 import { PartnerDrizzleRepository } from './repositories/partner-drizzle.repository'
 import { EventRepository } from '@/@core/events/domain/repositories/event.repository'
 import { EventDrizzleRepository } from './repositories/event-drizzle.repository'
+import { CustomerRepository } from '@/@core/events/domain/repositories/customer.repository'
+import { CustomerDrizzleRepository } from './repositories/customer-drizzle.repository'
 
 @Module({
   imports: [DrizzleModule],
@@ -16,7 +18,11 @@ import { EventDrizzleRepository } from './repositories/event-drizzle.repository'
       provide: EventRepository,
       useClass: EventDrizzleRepository,
     },
+    {
+      provide: CustomerRepository,
+      useClass: CustomerDrizzleRepository,
+    },
   ],
-  exports: [PartnerRepository, EventRepository],
+  exports: [PartnerRepository, EventRepository, CustomerRepository],
 })
 export class DatabaseModule {}
