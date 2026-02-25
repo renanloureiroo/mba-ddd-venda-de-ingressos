@@ -4,5 +4,5 @@ export interface IRepository<E extends AggregateRoot<any>> {
   save(entity: E): Promise<void>
   findById(id: any): Promise<E | null>
   findAll(): Promise<E[]>
-  delete(id: any): Promise<void>
+  delete(id: E): Promise<void>
 }

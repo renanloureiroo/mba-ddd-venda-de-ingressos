@@ -1,5 +1,7 @@
-import { Partner } from '../../../../domain/entities/partner.entity'
-import { PartnerId } from '../../../../domain/entities/partner.entity'
+import {
+  Partner,
+  PartnerId,
+} from '@/@core/events/domain/entities/partner.entity'
 import { PartnerMapper } from './partner.mapper'
 
 describe('PartnerMapper', () => {
