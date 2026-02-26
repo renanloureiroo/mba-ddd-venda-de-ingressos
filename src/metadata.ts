@@ -1,0 +1,9 @@
+/* eslint-disable */
+export default async () => {
+    const t = {
+        ["./core/events/domain/entities/partner.entity"]: await import("./core/events/domain/entities/partner.entity"),
+        ["./core/common/domain/value-objects/cpf.vo"]: await import("./core/common/domain/value-objects/cpf.vo"),
+        ["./core/events/domain/entities/customer.entity"]: await import("./core/events/domain/entities/customer.entity")
+    };
+    return { "@nestjs/swagger": { "models": [[import("./core/events/domain/entities/event.entity"), { "EventId": {}, "Event": { name: { required: true, type: () => String }, description: { required: true, type: () => String, nullable: true }, date: { required: true, type: () => Date }, isPublished: { required: true, type: () => Boolean }, totalSpots: { required: true, type: () => Number }, totalSpotsReserved: { required: true, type: () => Number }, partnerId: { required: true, type: () => t["./core/events/domain/entities/partner.entity"].PartnerId }, sections: { required: true } } }], [import("./core/events/domain/entities/partner.entity"), { "PartnerId": {}, "Partner": { name: { required: true, type: () => String } } }], [import("./core/events/domain/entities/customer.entity"), { "CustomerId": {}, "Customer": { cpf: { required: true, type: () => t["./core/common/domain/value-objects/cpf.vo"].Cpf }, name: { required: true, type: () => String } } }], [import("./core/events/application/dtos/register-customer-input.dto"), { "RegisterCustomerInputDTO": { name: { required: true, type: () => String }, cpf: { required: true, type: () => String } } }]], "controllers": [[import("./core/events/infra/http/controllers/customer.controller"), { "CustomerController": { "list": { type: [t["./core/events/domain/entities/customer.entity"].Customer] }, "register": {} } }]] } };
+};
