@@ -8,6 +8,7 @@ import { CustomerRepository } from '@/core/events/domain/repositories/customer.r
 import { CustomerMapper } from '../drizzle/mappers/customer.mapper'
 import { customers } from '../drizzle/schemas/customer.schema'
 import { DrizzleService } from '../drizzle/drizzle.service'
+import { Cpf } from '@/core/common/domain/value-objects/cpf.vo'
 
 @Injectable()
 export class CustomerDrizzleRepository implements CustomerRepository {
@@ -31,6 +32,15 @@ export class CustomerDrizzleRepository implements CustomerRepository {
       .select()
       .from(customers)
       .where(eq(customers.id, id.value))
+
+    return row ? CustomerMapper.toDomain(row) : null
+  }
+
+  async findByCpf(cpf: Cpf): Promise<Customer | null> {
+    const [row] = await this.drizzle.db
+      .select()
+      .from(customers)
+      .where(eq(customers.cpf, cpf.value))
 
     return row ? CustomerMapper.toDomain(row) : null
   }
