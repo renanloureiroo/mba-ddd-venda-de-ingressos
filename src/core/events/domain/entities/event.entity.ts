@@ -117,7 +117,7 @@ export class Event extends AggregateRoot<EventId> {
       totalSpots: this.totalSpots,
       totalSpotsReserved: this.totalSpotsReserved,
       partnerId: this.partnerId.value,
-      sections: [...this.sections].map((section) => section.toJson()),
+      sections: Array.from(this.sections).map((section) => section.toJson()),
     }
   }
 }

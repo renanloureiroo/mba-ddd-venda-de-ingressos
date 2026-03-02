@@ -1,5 +1,6 @@
 import { ValueObject } from './value-object'
 import { CpfValidator } from '../validators/cpf.validator'
+import { DomainError } from '@/core/common/application/domain.error'
 
 export class Cpf extends ValueObject<string> {
   constructor(value: string) {
@@ -20,7 +21,7 @@ export class Cpf extends ValueObject<string> {
   }
 }
 
-export class InvalidCpfError extends Error {
+export class InvalidCpfError extends DomainError {
   constructor(message: string) {
     super(message)
     this.name = 'InvalidCpfError'

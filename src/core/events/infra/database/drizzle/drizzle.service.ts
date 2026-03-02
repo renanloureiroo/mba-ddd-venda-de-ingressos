@@ -1,8 +1,20 @@
 import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common'
 import { drizzle, MySql2Database } from 'drizzle-orm/mysql2'
 import mysql from 'mysql2/promise'
-import { txStorage } from '@/core/common/infra/transaction.storage'
 import * as schemas from './schemas'
+import { ExtractTablesWithRelations } from 'drizzle-orm'
+import { MySqlTransaction } from 'drizzle-orm/mysql-core'
+import {
+  MySql2QueryResultHKT,
+  MySql2PreparedQueryHKT,
+} from 'drizzle-orm/mysql2'
+
+export type DrizzleTransaction = MySqlTransaction<
+  MySql2QueryResultHKT,
+  MySql2PreparedQueryHKT,
+  typeof schemas,
+  ExtractTablesWithRelations<typeof schemas>
+>
 
 @Injectable()
 export class DrizzleService implements OnModuleInit, OnModuleDestroy {
@@ -25,23 +37,7 @@ export class DrizzleService implements OnModuleInit, OnModuleDestroy {
     await this._pool.end()
   }
 
-  /**
-   * Retorna a transação ativa (se dentro de um @Transactional)
-   * ou o db normal caso contrário.
-   */
   get db(): MySql2Database<typeof schemas> {
-    const tx = txStorage.getStore()
-    return (tx as MySql2Database<typeof schemas> | undefined) ?? this._db
-  }
-
-  /**
-   * Abre uma transação e armazena no AsyncLocalStorage.
-   * Todos os repositórios que usam `this.drizzle.db` dentro deste contexto
-   * utilizarão automaticamente a mesma transação.
-   */
-  async runInTransaction<T>(fn: () => Promise<T>): Promise<T> {
-    return this._db.transaction((tx) =>
-      txStorage.run(tx as unknown as MySql2Database<typeof schemas>, fn),
-    )
+    return this._db
   }
 }

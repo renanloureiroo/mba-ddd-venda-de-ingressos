@@ -1,8 +1,6 @@
-export class DomainError extends Error {
-  private statusCode: number
-
-  constructor(message: string, statusCode: number) {
+export abstract class DomainError extends Error {
+  constructor(message: string) {
     super(message)
-    this.statusCode = statusCode
+    this.name = 'DomainError'
   }
 }

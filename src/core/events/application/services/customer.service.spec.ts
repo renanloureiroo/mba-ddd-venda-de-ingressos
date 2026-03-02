@@ -3,6 +3,7 @@ import { InMemoryCustomerRepository } from 'test/repositories/in-memory-customer
 import { CustomerService } from './customer.service'
 import { CustomerAlreadyExistsError } from '../errors/customer-already-exists.error'
 import { InvalidCpfError } from '@/core/common/domain/value-objects/cpf.vo'
+import { InMemoryUnitOfWork } from 'test/in-memory-unit-of-work'
 
 const CUSTOMER_CPF = '57192911054'
 const CUSTOMER_NAME = 'John Doe'
@@ -13,7 +14,8 @@ describe('Customer Service  Unit Spec', () => {
 
   beforeEach(async () => {
     repository = new InMemoryCustomerRepository()
-    sut = new CustomerService(repository)
+    const uow = new InMemoryUnitOfWork()
+    sut = new CustomerService(uow, repository)
   })
 
   describe('Register Customer', () => {

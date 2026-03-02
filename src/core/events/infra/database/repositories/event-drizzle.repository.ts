@@ -1,19 +1,23 @@
-import { Injectable } from '@nestjs/common'
 import { eq } from 'drizzle-orm'
 import { EventRepository } from '@/core/events/domain/repositories/event.repository'
 import { Event, EventId } from '@/core/events/domain/entities/event.entity'
 import { events, eventSections, eventSpots } from '../drizzle/schemas'
 import { EventMapper } from '../drizzle/mappers/event.mapper'
-import { DrizzleService } from '../drizzle/drizzle.service'
+import { DrizzleService, DrizzleTransaction } from '../drizzle/drizzle.service'
+import { Injectable } from '@nestjs/common'
+import { UnitOfWork } from '@/core/common/application/unit-of-work.interface'
 
 @Injectable()
 export class EventDrizzleRepository implements EventRepository {
-  constructor(private readonly drizzle: DrizzleService) {}
+  constructor(
+    private readonly drizzle: DrizzleService,
+    private readonly uow: UnitOfWork,
+  ) {}
 
   async save(entity: Event): Promise<void> {
     const { event, sections, spots } = EventMapper.toPersistence(entity)
 
-    await this.drizzle.db.transaction(async (tx) => {
+    this.uow.registerOperation(async (tx: DrizzleTransaction) => {
       await tx
         .insert(events)
         .values(event)
@@ -89,7 +93,7 @@ export class EventDrizzleRepository implements EventRepository {
   }
 
   async delete(entity: Event): Promise<void> {
-    await this.drizzle.db.transaction(async (tx) => {
+    this.uow.registerOperation(async (tx: DrizzleTransaction) => {
       await tx.delete(events).where(eq(events.id, entity.id.value))
     })
   }

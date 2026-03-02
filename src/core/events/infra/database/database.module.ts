@@ -6,6 +6,8 @@ import { EventRepository } from '@/core/events/domain/repositories/event.reposit
 import { EventDrizzleRepository } from './repositories/event-drizzle.repository'
 import { CustomerRepository } from '@/core/events/domain/repositories/customer.repository'
 import { CustomerDrizzleRepository } from './repositories/customer-drizzle.repository'
+import { UnitOfWorkDrizzleOrm } from '@/core/common/infra/unit-of-work-drizzle-orm'
+import { UnitOfWork } from '@/core/common/application/unit-of-work.interface'
 
 @Module({
   imports: [DrizzleModule],
@@ -22,7 +24,11 @@ import { CustomerDrizzleRepository } from './repositories/customer-drizzle.repos
       provide: CustomerRepository,
       useClass: CustomerDrizzleRepository,
     },
+    {
+      provide: UnitOfWork,
+      useClass: UnitOfWorkDrizzleOrm,
+    },
   ],
-  exports: [PartnerRepository, EventRepository, CustomerRepository],
+  exports: [PartnerRepository, EventRepository, CustomerRepository, UnitOfWork],
 })
 export class DatabaseModule {}

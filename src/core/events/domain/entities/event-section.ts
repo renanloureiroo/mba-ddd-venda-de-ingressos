@@ -89,7 +89,7 @@ export class EventSection extends Entity<EventSectionId> {
       totalSpots: this.totalSpots,
       totalSpotsReserved: this.totalSpotsReserved,
       price: this.price,
-      spots: [...this.spots].map((spot) => spot.toJson()),
+      spots: Array.from(this.spots).map((spot) => spot.toJson()),
     }
   }
 

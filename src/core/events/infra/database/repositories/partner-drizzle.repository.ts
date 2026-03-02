@@ -1,29 +1,34 @@
 import { Injectable } from '@nestjs/common'
-
 import { eq } from 'drizzle-orm'
 import { PartnerRepository } from '@/core/events/domain/repositories/partner.repository'
 import {
   Partner,
   PartnerId,
 } from '@/core/events/domain/entities/partner.entity'
-import { partners } from '../drizzle/schemas'
+import { partners } from '../drizzle/schemas/partner.schema'
 import { PartnerMapper } from '../drizzle/mappers/partner.mapper'
-import { DrizzleService } from '../drizzle/drizzle.service'
+import { DrizzleService, DrizzleTransaction } from '../drizzle/drizzle.service'
+import { UnitOfWork } from '@/core/common/application/unit-of-work.interface'
 
 @Injectable()
 export class PartnerDrizzleRepository implements PartnerRepository {
-  constructor(private readonly drizzle: DrizzleService) {}
+  constructor(
+    private readonly drizzle: DrizzleService,
+    private readonly uow: UnitOfWork,
+  ) {}
 
   async save(entity: Partner): Promise<void> {
     const data = PartnerMapper.toPersistence(entity)
-    await this.drizzle.db
-      .insert(partners)
-      .values(data)
-      .onDuplicateKeyUpdate({
-        set: {
-          name: data.name,
-        },
-      })
+    this.uow.registerOperation(async (tx: DrizzleTransaction) => {
+      await tx
+        .insert(partners)
+        .values(data)
+        .onDuplicateKeyUpdate({
+          set: {
+            name: data.name,
+          },
+        })
+    })
   }
 
   async findById(id: PartnerId): Promise<Partner | null> {
@@ -40,8 +45,8 @@ export class PartnerDrizzleRepository implements PartnerRepository {
   }
 
   async delete(entity: Partner): Promise<void> {
-    await this.drizzle.db
-      .delete(partners)
-      .where(eq(partners.id, entity.id.value))
+    this.uow.registerOperation(async (tx: DrizzleTransaction) => {
+      await tx.delete(partners).where(eq(partners.id, entity.id.value))
+    })
   }
 }

@@ -7,24 +7,30 @@ import {
 import { CustomerRepository } from '@/core/events/domain/repositories/customer.repository'
 import { CustomerMapper } from '../drizzle/mappers/customer.mapper'
 import { customers } from '../drizzle/schemas/customer.schema'
-import { DrizzleService } from '../drizzle/drizzle.service'
+import { DrizzleService, DrizzleTransaction } from '../drizzle/drizzle.service'
 import { Cpf } from '@/core/common/domain/value-objects/cpf.vo'
+import { UnitOfWork } from '@/core/common/application/unit-of-work.interface'
 
 @Injectable()
 export class CustomerDrizzleRepository implements CustomerRepository {
-  constructor(private readonly drizzle: DrizzleService) {}
+  constructor(
+    private readonly drizzle: DrizzleService,
+    private readonly uow: UnitOfWork,
+  ) {}
 
   async save(entity: Customer): Promise<void> {
     const data = CustomerMapper.toPersistence(entity)
-    await this.drizzle.db
-      .insert(customers)
-      .values(data)
-      .onDuplicateKeyUpdate({
-        set: {
-          name: data.name,
-          cpf: data.cpf,
-        },
-      })
+    this.uow.registerOperation(async (tx: DrizzleTransaction) => {
+      await tx
+        .insert(customers)
+        .values(data)
+        .onDuplicateKeyUpdate({
+          set: {
+            name: data.name,
+            cpf: data.cpf,
+          },
+        })
+    })
   }
 
   async findById(id: CustomerId): Promise<Customer | null> {
@@ -51,8 +57,8 @@ export class CustomerDrizzleRepository implements CustomerRepository {
   }
 
   async delete(entity: Customer): Promise<void> {
-    await this.drizzle.db
-      .delete(customers)
-      .where(eq(customers.id, entity.id.value))
+    this.uow.registerOperation(async (tx: DrizzleTransaction) => {
+      await tx.delete(customers).where(eq(customers.id, entity.id.value))
+    })
   }
 }
